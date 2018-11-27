@@ -20,13 +20,15 @@ def checkForWatering(tiSinceLastWatering, stWateringInProgress):
     
     #check for current soil moisture
     from GetSoilMoisture import getSoilMoisture
-    pctSoilMoisture = getSoilMoisture()
+    pctSoilMoistureSnsrAvg, pctSoilMoistureSnsr1, pctSoilMoistureSnsr2 = getSoilMoisture()
     
     # calculate running average
-    GV_PctSoilMoistureAvg = PctMoistAvg(pctSoilMoisture)
+    GV_PctSoilMoistureAvg = PctMoistAvg(pctSoilMoistureSnsrAvg)
     
-    print ('checkForWatering: Soil moisture avg GV: {0}%, thresholds: min {1}%, max {2}%'.format(GV_PctSoilMoistureAvg, \
-        GV_PctSoilMoistLoThd_P, GV_PctSoilMoistHiThd_P))
+    from datetime import datetime
+    print ('{0:%Y-%m-%d %H:%M:%S} checkForWatering: Moist: {1}% ({2}&{3}%), minThd: {4}%, maxThd: {5}%'\
+           .format(datetime.now(),GV_PctSoilMoistureAvg, pctSoilMoistureSnsr1, pctSoilMoistureSnsr2,\
+                   GV_PctSoilMoistLoThd_P, GV_PctSoilMoistHiThd_P))
         
     if GV_PctSoilMoistureAvg > GV_PctSoilMoistHiThd_P:
         # reset watering in progress flag when max moisture is reached
@@ -62,9 +64,9 @@ def checkForWatering(tiSinceLastWatering, stWateringInProgress):
         #print ('checkForWatering: Minimum elapsed time since last watering NOT reached')
     
     # Log data
-    dataLogger.info('{0},{1},{2},{3},{4},{5}' \
+    dataLogger.info('{0},{1},{2},{3},{4},{5},{6},{7}' \
                 .format(tiSinceLastWatering, GV_TiMinBetwWaterings_P, stWateringInProgress, \
-                GV_PctSoilMoistureAvg, GV_PctSoilMoistLoThd_P, GV_PctSoilMoistHiThd_P))
+                GV_PctSoilMoistureAvg, pctSoilMoistureSnsr1, pctSoilMoistureSnsr2, GV_PctSoilMoistLoThd_P, GV_PctSoilMoistHiThd_P))
     
     return reqWatering, stWateringInProgress
 
@@ -75,13 +77,13 @@ def PctMoistAvg(pctSoilMoisture):
     OUTPUT: Rolling average of the measured moisture
     """
     # import global average
-    from waterpi import GV_PctSoilMoistureAvg_Y, GV_PctSoilMoistureAvg
+    from waterpi import GV_PctSoilMoistureAvg_Y, GV_PctSoilMoistureAvg, GV_NrAvgRng
     
     # reset sum for average
     sumMoist = 0    
 
     # shift old values in the array
-    for k in range(3,-1,-1):
+    for k in range(GV_NrAvgRng-1,-1,-1):
         #print('k: {0}'.format(k))
         GV_PctSoilMoistureAvg_Y[k] = GV_PctSoilMoistureAvg_Y[k-1]
 
@@ -90,12 +92,7 @@ def PctMoistAvg(pctSoilMoisture):
     #print('GV_PctSoilMoistureAvg_Y: {0}'.format(GV_PctSoilMoistureAvg_Y))
     
     # calculate average
-    for k in range(4):
-        sumMoist += GV_PctSoilMoistureAvg_Y[k-1]
-
-    avgMoist = sumMoist / 4
+    avgMoist = sum(GV_PctSoilMoistureAvg_Y) / len(GV_PctSoilMoistureAvg_Y)
+    
     #print('avgMoist: {0}, sumMoist: {1}'.format(avgMoist,sumMoist))
     return avgMoist
-
-    
-    

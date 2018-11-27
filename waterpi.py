@@ -10,11 +10,12 @@ import time, datetime, logging
 # Global Parameters
 GV_TiMinBetwWaterings_Minutes_P = 180 # [min] Minimum elapsed time between 2 waterings
 GV_TiMinBetwWaterings_P         = GV_TiMinBetwWaterings_Minutes_P * 60 \
-                                      # [s] Minimum elapsed time between 2 waterings
-GV_PctSoilMoistLoThd_P          = 75  # [%] Soil moisture lower threshold to start watering
-GV_PctSoilMoistHiThd_P          = 90  # [%] Soil moisture upper threshold to finish watering
-GV_TiIntrvlToWateringCheck_P    = 60  # Time interval [s] to check if watering is necessary
-GV_TiDurPumpActv_P              = 10  # [s] Duration of activating the pump when watering
+                                     # [s] Minimum elapsed time between 2 waterings
+GV_PctSoilMoistLoThd_P          = 75 # [%] Soil moisture lower threshold to start watering
+GV_PctSoilMoistHiThd_P          = 90 # [%] Soil moisture upper threshold to finish watering
+GV_TiIntrvlToWateringCheck_P    = 60 # Time interval [s] to check if watering is necessary
+GV_TiDurPumpActv_P              = 10 # [s] Duration of activating the pump when watering
+GV_NrAvgRng                     = 10  # Running average factor (number of samples)
 
 # old params
 #GV_StSumpWaterLevelMonitoringEnad_P   = 0   # [bool] Enable or diasble monitoring the water level in the pump sump
@@ -22,7 +23,7 @@ GV_TiDurPumpActv_P              = 10  # [s] Duration of activating the pump when
 
 # Global variables
 GV_PctSoilMoistureAvg = GV_PctSoilMoistLoThd_P
-GV_PctSoilMoistureAvg_Y = [GV_PctSoilMoistLoThd_P]*4
+GV_PctSoilMoistureAvg_Y = [GV_PctSoilMoistLoThd_P]*GV_NrAvgRng
 
 def main():
     # main code
@@ -61,7 +62,7 @@ def main():
     loggerWaterPiApp.info('WaterPi Application staring')
     
     # make sure the code starts with watering immediately 
-    tiSinceLastWatering = GV_TiMinBetwWaterings_P
+    tiSinceLastWatering = GV_TiMinBetwWaterings_P - (GV_TiIntrvlToWateringCheck_P*2)
     stWateringInProgress = 0    
     
     # main loop

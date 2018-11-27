@@ -3,7 +3,7 @@ def readSensor():
     # the screen.
     # Author: Tony DiCola
     # License: Public Domain
-    import time
+    #import time
 
     # Import the ADS1x15 module.
     import Adafruit_ADS1x15
@@ -27,7 +27,7 @@ def readSensor():
     #  -   8 = +/-0.512V
     #  -  16 = +/-0.256V
     # See table 3 in the ADS1015/ADS1115 datasheet for more info on gain.
-    RS_ValAdcGain = 1
+    valAdcGain = 1
 
     #print('Reading ADS1x15 values, press Ctrl-C to quit...')
     # Print nice channel column headers.
@@ -41,7 +41,14 @@ def readSensor():
         #values = [0]*4
 
             # Read the specified ADC channel using the previously set gain value.
-    RS_ValAdc = adc.read_adc(2, gain=RS_ValAdcGain)
+    valAdc1 = [0]*5
+    valAdc2 = [0]*5
+    
+    i = 0
+    while i < 5:
+        valAdc1[i] = adc.read_adc(1, gain=valAdcGain)
+        valAdc2[i] = adc.read_adc(2, gain=valAdcGain)
+        i += 1
             # Note you can also pass in an optional data_rate parameter that controls
             # the ADC conversion time (in samples/second). Each chip has a different
             # set of allowed data rate values, see datasheet Table 9 config register
@@ -54,7 +61,11 @@ def readSensor():
         #print('| {0:>6} |'.format(RS_ValAdc))
         # Pause for half a second.
         #time.sleep(0.5)
-       # i += 1
+    
+    #average
+    valAdc1Avg = sum(valAdc1) / len(valAdc1)
+    valAdc2Avg = sum(valAdc2) / len(valAdc2)  
+       
     adc.stop_adc()
-    return RS_ValAdc
+    return valAdc1Avg, valAdc2Avg
         
