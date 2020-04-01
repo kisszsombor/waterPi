@@ -20,15 +20,15 @@ def checkForWatering(tiSinceLastWatering, stWateringInProgress):
     
     #check for current soil moisture
     from GetSoilMoisture import getSoilMoisture
-    pctSoilMoistureSnsrAvg, pctSoilMoistureSnsr1, pctSoilMoistureSnsr2 = getSoilMoisture()
+    pctSoilMoistureSnsrAvg, pctSoilMoistureSnsr1, pctSoilMoistureSnsr2, tSoil = getSoilMoisture()
     
     # calculate running average
     GV_PctSoilMoistureAvg = PctMoistAvg(pctSoilMoistureSnsrAvg)
     
     from datetime import datetime
-    print ('{0:%Y-%m-%d %H:%M:%S} checkForWatering: Moist: {1}% ({2}&{3}%), minThd: {4}%, maxThd: {5}%'\
+    print ('{0:%Y-%m-%d %H:%M:%S} Moist: {1}% ({2}&{3}%), Thd: {4}%&{5}%, Temp: {6:.1f}, time since watering {7:.1f} m'\
            .format(datetime.now(),GV_PctSoilMoistureAvg, pctSoilMoistureSnsr1, pctSoilMoistureSnsr2,\
-                   GV_PctSoilMoistLoThd_P, GV_PctSoilMoistHiThd_P))
+                   GV_PctSoilMoistLoThd_P, GV_PctSoilMoistHiThd_P, tSoil, tiSinceLastWatering/60))
         
     if GV_PctSoilMoistureAvg > GV_PctSoilMoistHiThd_P:
         # reset watering in progress flag when max moisture is reached
@@ -64,9 +64,9 @@ def checkForWatering(tiSinceLastWatering, stWateringInProgress):
         #print ('checkForWatering: Minimum elapsed time since last watering NOT reached')
     
     # Log data
-    dataLogger.info('{0},{1},{2},{3},{4},{5},{6},{7}' \
+    dataLogger.info('{0},{1},{2},{3},{4},{5},{6},{7},{8:.1f}' \
                 .format(tiSinceLastWatering, GV_TiMinBetwWaterings_P, stWateringInProgress, \
-                GV_PctSoilMoistureAvg, pctSoilMoistureSnsr1, pctSoilMoistureSnsr2, GV_PctSoilMoistLoThd_P, GV_PctSoilMoistHiThd_P))
+                GV_PctSoilMoistureAvg, pctSoilMoistureSnsr1, pctSoilMoistureSnsr2, GV_PctSoilMoistLoThd_P, GV_PctSoilMoistHiThd_P, tSoil))
     
     return reqWatering, stWateringInProgress
 

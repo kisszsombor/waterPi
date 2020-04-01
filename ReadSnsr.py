@@ -41,11 +41,13 @@ def readSensor():
         #values = [0]*4
 
             # Read the specified ADC channel using the previously set gain value.
+    valAdc0 = [0]*5
     valAdc1 = [0]*5
     valAdc2 = [0]*5
     
     i = 0
     while i < 5:
+        valAdc0[i] = adc.read_adc(0, gain=valAdcGain)
         valAdc1[i] = adc.read_adc(1, gain=valAdcGain)
         valAdc2[i] = adc.read_adc(2, gain=valAdcGain)
         i += 1
@@ -63,9 +65,10 @@ def readSensor():
         #time.sleep(0.5)
     
     #average
+    valAdc0Avg = sum(valAdc0) / len(valAdc0)
     valAdc1Avg = sum(valAdc1) / len(valAdc1)
     valAdc2Avg = sum(valAdc2) / len(valAdc2)  
        
     adc.stop_adc()
-    return valAdc1Avg, valAdc2Avg
+    return valAdc0Avg, valAdc1Avg, valAdc2Avg
         

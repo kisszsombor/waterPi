@@ -8,14 +8,14 @@ OUTPUT: no output
 import time, datetime, logging
 
 # Global Parameters
-GV_TiMinBetwWaterings_Minutes_P = 180 # [min] Minimum elapsed time between 2 waterings
+GV_TiMinBetwWaterings_Minutes_P = 640 # [min] Minimum elapsed time between 2 waterings
 GV_TiMinBetwWaterings_P         = GV_TiMinBetwWaterings_Minutes_P * 60 \
                                      # [s] Minimum elapsed time between 2 waterings
 GV_PctSoilMoistLoThd_P          = 75 # [%] Soil moisture lower threshold to start watering
-GV_PctSoilMoistHiThd_P          = 90 # [%] Soil moisture upper threshold to finish watering
+GV_PctSoilMoistHiThd_P          = 85 # [%] Soil moisture upper threshold to finish watering
 GV_TiIntrvlToWateringCheck_P    = 60 # Time interval [s] to check if watering is necessary
-GV_TiDurPumpActv_P              = 10 # [s] Duration of activating the pump when watering
-GV_NrAvgRng                     = 10  # Running average factor (number of samples)
+GV_TiDurPumpActv_P              = 15 # [s] Duration of activating the pump when watering
+GV_NrAvgRng                     = 50 # Running average factor (number of samples)
 
 # old params
 #GV_StSumpWaterLevelMonitoringEnad_P   = 0   # [bool] Enable or diasble monitoring the water level in the pump sump
@@ -49,7 +49,8 @@ def main():
     loggerWaterPiData.setLevel(logging.INFO) # log all escalated at and above DEBUG
     # add a file handler
     from datetime import datetime
-    fh_loggerWaterPiData = logging.FileHandler('/home/pi/project/waterpi/log/WaterPiData_{:%Y-%m-%d}.log'.format(datetime.now()))
+    #fh_loggerWaterPiData = logging.FileHandler('/home/pi/project/waterpi/log/WaterPiData_{:%Y-%m-%d}.log'.format(datetime.now()))
+    fh_loggerWaterPiData = logging.FileHandler('/home/pi/project/waterpi/log/WaterPiDataLog.csv')
     fh_loggerWaterPiData.setLevel(logging.INFO) # ensure all messages are logged to file
     # create a formatter and set the formatter for the handler.
     formatter = logging.Formatter('%(asctime)s,%(name)s,%(levelname)s,%(message)s',\
@@ -63,7 +64,7 @@ def main():
     
     # make sure the code starts with watering immediately 
     tiSinceLastWatering = GV_TiMinBetwWaterings_P - (GV_TiIntrvlToWateringCheck_P*2)
-    stWateringInProgress = 0    
+    stWateringInProgress = 0
     
     # main loop
     while True:
